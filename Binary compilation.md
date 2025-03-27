@@ -177,18 +177,18 @@ objdump -d hello_O3 | less
 
 
 
-# âœ… Applying Binary Stripping Techniques During Compilation on Linux (GCC)
+# ✅ Applying Binary Stripping Techniques During Compilation on Linux (GCC)
 
 ---
 
-## ðŸ”¥ 1. What is Binary Stripping?
+## 🔥 1. What is Binary Stripping?
 **Binary stripping** is the process of removing symbols, debugging information, and metadata from compiled binaries. This makes the binaries:
 
 - **Smaller in size.**
 - **Harder to reverse engineer.**
 - **More challenging for LLM-based decompilers** (like **LLM4Decompile** and **DeGPT**) to recover meaningful code.
 
-âœ… **Types of Stripping Techniques:**  
+✅  **Types of Stripping Techniques:**  
 - **Removing Debug Symbols** â†’ Strips symbols used for debugging.  
 - **Removing All Symbols** â†’ Strips all symbols (including function names).  
 - **Removing Specific Sections** â†’ Strips individual sections like `.text`, `.data`, `.bss`, etc.  
@@ -196,22 +196,22 @@ objdump -d hello_O3 | less
 
 ---
 
-## ðŸ”¥ 2. Stripping Techniques with Commands
+## 🔥  2. Stripping Techniques with Commands
 
-### âœ… 2.1. Compile with Debug Symbols
+### ✅ 2.1. Compile with Debug Symbols
 First, compile the binary with **debugging symbols** (`-g` flag).
 
-âœ… **Command:**
+✅ **Command:**
 ```bash
 # Compile with debug symbols
 gcc -g -o hello_dbg hello_world.c
 ```
 
-âœ… **Check for symbols:**
+✅  **Check for symbols:**
 ```bash
 nm hello_dbg
 ```
-âœ… **Output Example:**
+**Output Example:**
 ```
 0000000000401130 T main  
 0000000000401140 t frame_dummy  
@@ -222,15 +222,15 @@ nm hello_dbg
 
 ---
 
-### âœ… 2.2. Strip Debug Symbols Only
+### ✅  2.2. Strip Debug Symbols Only
 
-âœ… **Command:**
+✅  **Command:**
 ```bash
 # Strip debug symbols only
 strip --strip-debug hello_dbg -o hello_stripped_debug
 ```
 
-âœ… **Check the symbols again:**
+✅  **Check the symbols again:**
 ```bash
 nm hello_stripped_debug
 ```
@@ -238,31 +238,31 @@ nm hello_stripped_debug
 ```
 (no symbols)
 ```
-â†’ **Effect:** Removes only **debug symbols**, keeping function names intact.
+→  **Effect:** Removes only **debug symbols**, keeping function names intact.
 
 ---
 
-### âœ… 2.3. Strip All Symbols
+### ✅  2.3. Strip All Symbols
 
-âœ… **Command:**
+✅ **Command:**
 ```bash
 # Strip all symbols
 strip --strip-all hello_dbg -o hello_stripped_all
 ```
 
-âœ… **Check the symbols:**
+✅ **Check the symbols:**
 ```bash
 nm hello_stripped_all
 ```
-âœ… **Output:**
+✅ **Output:**
 ```
 (no symbols)
 ```
-â†’ **Effect:** Removes **all symbols**, making it much harder to reverse engineer.
+→ **Effect:** Removes **all symbols**, making it much harder to reverse engineer.
 
 ---
 
-### âœ… 2.4. Strip Specific Sections
+### ✅  2.4. Strip Specific Sections
 You can **strip individual sections** (e.g., `.symtab`, `.debug`, `.bss`, etc.).
 
 âœ… **List all sections:**
