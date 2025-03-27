@@ -400,7 +400,7 @@ chmod +x strip_binaries.sh
 
 ---
 
-## ðŸ”¥ 5. Conclusion
+## 5. Conclusion
  You now have multiple techniques to apply **binary stripping** during compilation:
 
 1. **Manual stripping** with `strip` and `objcopy`.  
