@@ -269,7 +269,7 @@ You can **strip individual sections** (e.g., `.symtab`, `.debug`, `.bss`, etc.).
 ```bash
 readelf -S hello_dbg
 ```
-âœ… **Example Output:**
+**Example Output:**
 ```
 [Nr] Name      Type            Address          Offset  
 [ 1] .text     PROGBITS        0000000000401000  0x1000  
@@ -279,38 +279,38 @@ readelf -S hello_dbg
 [ 5] .strtab   STRTAB          0000000000000000  0x5000  
 ```
 
-âœ… **Strip `.symtab` and `.strtab`:**
+**Strip `.symtab` and `.strtab`:**
 ```bash
 objcopy --remove-section=.symtab --remove-section=.strtab hello_dbg hello_custom_strip
 ```
 
-âœ… **Verify sections:**
+**Verify sections:**
 ```bash
 readelf -S hello_custom_strip
 ```
-â†’ **Effect:** Removes the **symbol table** and **string table**, making the binary harder to analyze.
+**Effect:** Removes the **symbol table** and **string table**, making the binary harder to analyze.
 
 ---
 
-### âœ… 2.5. Strip During Compilation (GCC Flags)
+### 2.5. Strip During Compilation (GCC Flags)
 You can instruct **GCC to automatically strip symbols** during the compilation process by adding the `-s` flag.
 
-âœ… **Command:**
+**Command:**
 ```bash
 # Compile and strip simultaneously
 gcc -s -o hello_stripped hello_world.c
 ```
 
-âœ… **Verify the binary:**
+ **Verify the binary:**
 ```bash
 nm hello_stripped
 ```
-âœ… **Output:**
+ **Output:**
 ```
 (no symbols)
 ```
 
-â†’ **Effect:**  
+ **Effect:**  
 - The binary is **smaller and stripped** of symbols.  
 - **No need for manual stripping** after compilation.  
 
@@ -319,7 +319,7 @@ nm hello_stripped
 ### âœ… 2.6. Strip with Optimization Levels
 You can **combine stripping with different optimization levels** during compilation.
 
-âœ… **Command Examples:**
+ **Command Examples:**
 ```bash
 # Compile with -O3 and strip all symbols
 gcc -O3 -s -o hello_O3_stripped hello_world.c
@@ -328,23 +328,23 @@ gcc -O3 -s -o hello_O3_stripped hello_world.c
 gcc -Os -s -o hello_Os_stripped hello_world.c
 ```
 
-âœ… **Check the size:**
+ **Check the size:**
 ```bash
 ls -lh hello_*
 ```
-â†’ **Effect:**  
+**Effect:**  
 - The binaries will be **smaller and harder to reverse engineer**.  
 - **LLM-based decompilers** will struggle with stripped binaries.  
 
 ---
 
-## ðŸ”¥ 3. Combine Stripping + Obfuscation
+## 3. Combine Stripping + Obfuscation
 To **further harden binaries**:
 
 - **Compile with optimization + stripping.**
 - **Apply obfuscation before stripping.**
 
-âœ… **Example Commands:**
+ **Example Commands:**
 ```bash
 # Compile with obfuscation (LLVM)
 clang -mllvm -fla -o obf_test hello_world.c
@@ -352,20 +352,20 @@ clang -mllvm -fla -o obf_test hello_world.c
 # Strip symbols
 strip --strip-all obf_test -o obf_stripped
 ```
-â†’ **Effect:**  
+ **Effect:**  
 - **Obfuscation** makes the **control flow complex**.  
 - **Stripping** removes symbols.  
 - **LLM-based decompilers** will struggle to recover meaningful code.  
 
 ---
 
-## ðŸ”¥ 4. Automate Stripping for Multiple Binaries
+## 4. Automate Stripping for Multiple Binaries
 If you want to **automate stripping for multiple binaries**:
 
 - Create a directory with multiple binaries: `/binaries`.  
 - Use the following script:  
 
-âœ… **Script:**
+ **Script:**
 ```bash
 #!/bin/bash
 
@@ -388,20 +388,20 @@ for binary in "$BIN_DIR"/*; do
 done
 ```
 
-âœ… **Usage:**
+ **Usage:**
 ```bash
 chmod +x strip_binaries.sh
 ./strip_binaries.sh
 ```
 
-âœ… **Effect:**  
+ **Effect:**  
 - Automatically **strips all binaries** in the `/binaries` directory.  
 - Saves **stripped versions** in `/stripped_binaries`.  
 
 ---
 
 ## ðŸ”¥ 5. Conclusion
-âœ… You now have multiple techniques to apply **binary stripping** during compilation:
+ You now have multiple techniques to apply **binary stripping** during compilation:
 
 1. **Manual stripping** with `strip` and `objcopy`.  
 2. **GCC flags (`-s`)** to strip during compilation.  
@@ -409,5 +409,5 @@ chmod +x strip_binaries.sh
 4. **Combining stripping with obfuscation** for stronger protection.  
 5. **Automating stripping** for multiple binaries.  
 
-âœ… You can now test the stripped binaries against **LLM4Decompile** and **DeGPT** to **evaluate decompilation accuracy** on hardened binaries! ðŸš€
+ You can now test the stripped binaries against **LLM4Decompile** and **DeGPT** to **evaluate decompilation accuracy** on hardened binaries! ðŸš€
 
