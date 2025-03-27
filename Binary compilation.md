@@ -174,3 +174,240 @@ objdump -d hello_O3 | less
 5. Use the **binaries for decompilation testing** with **LLM4Decompile** and **DeGPT** to evaluate their decompilation accuracy across different optimization levels.  
 
 ✅ Let me know if you need **further experimentation, additional compiler flags**, or testing scripts! 🚀
+
+
+
+# âœ… Applying Binary Stripping Techniques During Compilation on Linux (GCC)
+
+---
+
+## ðŸ”¥ 1. What is Binary Stripping?
+**Binary stripping** is the process of removing symbols, debugging information, and metadata from compiled binaries. This makes the binaries:
+
+- **Smaller in size.**
+- **Harder to reverse engineer.**
+- **More challenging for LLM-based decompilers** (like **LLM4Decompile** and **DeGPT**) to recover meaningful code.
+
+âœ… **Types of Stripping Techniques:**  
+- **Removing Debug Symbols** â†’ Strips symbols used for debugging.  
+- **Removing All Symbols** â†’ Strips all symbols (including function names).  
+- **Removing Specific Sections** â†’ Strips individual sections like `.text`, `.data`, `.bss`, etc.  
+- **Using Compiler Flags** â†’ Instructs the compiler to strip during compilation.  
+
+---
+
+## ðŸ”¥ 2. Stripping Techniques with Commands
+
+### âœ… 2.1. Compile with Debug Symbols
+First, compile the binary with **debugging symbols** (`-g` flag).
+
+âœ… **Command:**
+```bash
+# Compile with debug symbols
+gcc -g -o hello_dbg hello_world.c
+```
+
+âœ… **Check for symbols:**
+```bash
+nm hello_dbg
+```
+âœ… **Output Example:**
+```
+0000000000401130 T main  
+0000000000401140 t frame_dummy  
+0000000000401160 T __libc_csu_init  
+0000000000401200 T __libc_csu_fini  
+```
+â†’ You will see the **function symbols and other debug information**.
+
+---
+
+### âœ… 2.2. Strip Debug Symbols Only
+
+âœ… **Command:**
+```bash
+# Strip debug symbols only
+strip --strip-debug hello_dbg -o hello_stripped_debug
+```
+
+âœ… **Check the symbols again:**
+```bash
+nm hello_stripped_debug
+```
+âœ… **Output:**
+```
+(no symbols)
+```
+â†’ **Effect:** Removes only **debug symbols**, keeping function names intact.
+
+---
+
+### âœ… 2.3. Strip All Symbols
+
+âœ… **Command:**
+```bash
+# Strip all symbols
+strip --strip-all hello_dbg -o hello_stripped_all
+```
+
+âœ… **Check the symbols:**
+```bash
+nm hello_stripped_all
+```
+âœ… **Output:**
+```
+(no symbols)
+```
+â†’ **Effect:** Removes **all symbols**, making it much harder to reverse engineer.
+
+---
+
+### âœ… 2.4. Strip Specific Sections
+You can **strip individual sections** (e.g., `.symtab`, `.debug`, `.bss`, etc.).
+
+âœ… **List all sections:**
+```bash
+readelf -S hello_dbg
+```
+âœ… **Example Output:**
+```
+[Nr] Name      Type            Address          Offset  
+[ 1] .text     PROGBITS        0000000000401000  0x1000  
+[ 2] .data     PROGBITS        0000000000601000  0x2000  
+[ 3] .bss      NOBITS          0000000000602000  0x3000  
+[ 4] .symtab   SYMTAB          0000000000000000  0x4000  
+[ 5] .strtab   STRTAB          0000000000000000  0x5000  
+```
+
+âœ… **Strip `.symtab` and `.strtab`:**
+```bash
+objcopy --remove-section=.symtab --remove-section=.strtab hello_dbg hello_custom_strip
+```
+
+âœ… **Verify sections:**
+```bash
+readelf -S hello_custom_strip
+```
+â†’ **Effect:** Removes the **symbol table** and **string table**, making the binary harder to analyze.
+
+---
+
+### âœ… 2.5. Strip During Compilation (GCC Flags)
+You can instruct **GCC to automatically strip symbols** during the compilation process by adding the `-s` flag.
+
+âœ… **Command:**
+```bash
+# Compile and strip simultaneously
+gcc -s -o hello_stripped hello_world.c
+```
+
+âœ… **Verify the binary:**
+```bash
+nm hello_stripped
+```
+âœ… **Output:**
+```
+(no symbols)
+```
+
+â†’ **Effect:**  
+- The binary is **smaller and stripped** of symbols.  
+- **No need for manual stripping** after compilation.  
+
+---
+
+### âœ… 2.6. Strip with Optimization Levels
+You can **combine stripping with different optimization levels** during compilation.
+
+âœ… **Command Examples:**
+```bash
+# Compile with -O3 and strip all symbols
+gcc -O3 -s -o hello_O3_stripped hello_world.c
+
+# Compile with -Os (size optimization) and strip
+gcc -Os -s -o hello_Os_stripped hello_world.c
+```
+
+âœ… **Check the size:**
+```bash
+ls -lh hello_*
+```
+â†’ **Effect:**  
+- The binaries will be **smaller and harder to reverse engineer**.  
+- **LLM-based decompilers** will struggle with stripped binaries.  
+
+---
+
+## ðŸ”¥ 3. Combine Stripping + Obfuscation
+To **further harden binaries**:
+
+- **Compile with optimization + stripping.**
+- **Apply obfuscation before stripping.**
+
+âœ… **Example Commands:**
+```bash
+# Compile with obfuscation (LLVM)
+clang -mllvm -fla -o obf_test hello_world.c
+
+# Strip symbols
+strip --strip-all obf_test -o obf_stripped
+```
+â†’ **Effect:**  
+- **Obfuscation** makes the **control flow complex**.  
+- **Stripping** removes symbols.  
+- **LLM-based decompilers** will struggle to recover meaningful code.  
+
+---
+
+## ðŸ”¥ 4. Automate Stripping for Multiple Binaries
+If you want to **automate stripping for multiple binaries**:
+
+- Create a directory with multiple binaries: `/binaries`.  
+- Use the following script:  
+
+âœ… **Script:**
+```bash
+#!/bin/bash
+
+# Input/Output Folders
+BIN_DIR="./binaries"
+STRIPPED_DIR="./stripped_binaries"
+mkdir -p "$STRIPPED_DIR"
+
+# Iterate through each binary and strip symbols
+for binary in "$BIN_DIR"/*; do
+    base_name=$(basename "$binary")
+    
+    # Strip debug symbols
+    strip --strip-debug "$binary" -o "$STRIPPED_DIR/${base_name}_strip_dbg"
+
+    # Strip all symbols
+    strip --strip-all "$binary" -o "$STRIPPED_DIR/${base_name}_strip_all"
+
+    echo "Stripped $binary and saved in $STRIPPED_DIR"
+done
+```
+
+âœ… **Usage:**
+```bash
+chmod +x strip_binaries.sh
+./strip_binaries.sh
+```
+
+âœ… **Effect:**  
+- Automatically **strips all binaries** in the `/binaries` directory.  
+- Saves **stripped versions** in `/stripped_binaries`.  
+
+---
+
+## ðŸ”¥ 5. Conclusion
+âœ… You now have multiple techniques to apply **binary stripping** during compilation:
+
+1. **Manual stripping** with `strip` and `objcopy`.  
+2. **GCC flags (`-s`)** to strip during compilation.  
+3. **Selective stripping of sections** for custom protection.  
+4. **Combining stripping with obfuscation** for stronger protection.  
+5. **Automating stripping** for multiple binaries.  
+
+âœ… You can now test the stripped binaries against **LLM4Decompile** and **DeGPT** to **evaluate decompilation accuracy** on hardened binaries! ðŸš€
+
