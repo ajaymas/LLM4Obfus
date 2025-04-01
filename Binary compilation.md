@@ -173,7 +173,7 @@ objdump -d hello_O3 | less
 4. You can **analyze the binaries with `objdump`** to observe the differences in assembly code.  
 5. Use the **binaries for decompilation testing** with **LLM4Decompile** and **DeGPT** to evaluate their decompilation accuracy across different optimization levels.  
 
-✅ Let me know if you need **further experimentation, additional compiler flags**, or testing scripts! 🚀
+
 
 
 
